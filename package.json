@@ -10,7 +10,6 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@cloudflare/next-on-pages": "^1.13.16",
     "@supabase/supabase-js": "^2.117.2",
     "next": "^15.5.27",
     "qrcode.react": "^4.2.0",
