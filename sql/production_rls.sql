@@ -51,11 +51,13 @@ RETURNS UUID LANGUAGE sql SECURITY DEFINER STABLE AS $$
 $$;
 
 -- Step 4: PROFILES
+-- Important: do NOT add a profiles SELECT policy that calls is_oata_staff().
+-- is_oata_staff() reads public.profiles, so using it in a profiles policy causes
+-- PostgreSQL error 42P17: infinite recursion detected in policy for relation "profiles".
+-- Staff-wide profile administration should be done via server-side service_role/API routes,
+-- not client-side RLS policies on profiles.
 CREATE POLICY "profiles_self_read" ON public.profiles FOR SELECT TO authenticated USING (id = auth.uid());
-CREATE POLICY "profiles_staff_read" ON public.profiles FOR SELECT TO authenticated USING (public.is_oata_staff());
 CREATE POLICY "profiles_self_update" ON public.profiles FOR UPDATE TO authenticated USING (id = auth.uid()) WITH CHECK (id = auth.uid());
-CREATE POLICY "profiles_staff_update" ON public.profiles FOR UPDATE TO authenticated USING (public.is_oata_staff()) WITH CHECK (public.is_oata_staff());
-CREATE POLICY "profiles_staff_insert" ON public.profiles FOR INSERT TO authenticated WITH CHECK (public.is_oata_staff());
 
 -- Step 5: COMPANIES
 CREATE POLICY "companies_staff_read" ON public.companies FOR SELECT TO authenticated USING (public.is_oata_staff());
