@@ -421,7 +421,7 @@ export default function Home() {
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-7xl flex-col gap-5 px-5 py-5 lg:flex-row lg:items-center lg:justify-between lg:px-8">
           <div className="flex items-center gap-4">
-            <img src="/oata-logo.png" alt="OATA" className="h-14 w-auto" />
+            <img src="/oata-logo.png" alt="OATA" className="h-20 w-auto" />
             <div className="hidden h-10 w-px bg-slate-200 sm:block" />
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#327482]">Care Portal</p>
