@@ -342,7 +342,7 @@ export default function Home() {
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_15%,rgba(34,200,216,0.24),transparent_32%),radial-gradient(circle_at_70%_85%,rgba(214,166,65,0.22),transparent_34%)]" />
             <div className="relative z-10 flex min-h-full flex-col justify-between gap-12">
               <div>
-                <img src="/oata-logo.svg" alt="OATA Maintenance and Cleaning" className="h-16 w-auto rounded-2xl bg-white p-2" />
+                <img src="/oata-logo.png" alt="OATA Maintenance and Cleaning" className="h-24 w-auto rounded-2xl bg-white p-2" />
                 <p className="mt-10 text-sm font-semibold uppercase tracking-[0.34em] text-[#9deaf2]">OATA Care Portal</p>
                 <h1 className="mt-5 max-w-3xl text-5xl font-semibold tracking-[-0.06em] text-white sm:text-6xl">
                   Reliable care. Lasting quality.
@@ -369,7 +369,7 @@ export default function Home() {
 
           <div className="flex items-center justify-center px-6 py-10 sm:px-10">
             <section className="w-full max-w-md rounded-[2rem] border border-slate-200 bg-white p-7 shadow-2xl shadow-slate-900/10">
-              <img src="/oata-logo.svg" alt="OATA" className="h-14 w-auto" />
+              <img src="/oata-logo.png" alt="OATA" className="h-20 w-auto" />
               <div className="mt-8">
                 <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#327482]">Secure access</p>
                 <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em]">Sign in</h2>
@@ -421,7 +421,7 @@ export default function Home() {
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-7xl flex-col gap-5 px-5 py-5 lg:flex-row lg:items-center lg:justify-between lg:px-8">
           <div className="flex items-center gap-4">
-            <img src="/oata-logo.svg" alt="OATA" className="h-14 w-auto" />
+            <img src="/oata-logo.png" alt="OATA" className="h-14 w-auto" />
             <div className="hidden h-10 w-px bg-slate-200 sm:block" />
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#327482]">Care Portal</p>
