@@ -14,10 +14,11 @@ const STAFF_ROLES = new Set([
 ]);
 
 const FIELD_ROLES = new Set(["technician", "leadman", "head_of_technical", "hvac_ecology_supervisor"]);
+const REVIEW_ROLES = new Set(["oata_admin", "oata_manager", "head_of_technical", "hvac_ecology_supervisor", "leadman"]);
 
 type StatusPayload = {
   job_id?: string;
-  action?: "accept" | "start" | "submit_review";
+  action?: "accept" | "start" | "submit_review" | "leadman_approve" | "send_back";
   notes?: string | null;
   diagnosis?: string | null;
   work_performed?: string | null;
@@ -66,7 +67,7 @@ export async function POST(request: NextRequest) {
   const jobId = normalize(payload.job_id);
   const action = payload.action;
 
-  if (!jobId || !action || !["accept", "start", "submit_review"].includes(action)) {
+  if (!jobId || !action || !["accept", "start", "submit_review", "leadman_approve", "send_back"].includes(action)) {
     return NextResponse.json({ error: "Job ID and valid action are required." }, { status: 400 });
   }
 
@@ -147,6 +148,37 @@ export async function POST(request: NextRequest) {
       status: "awaiting_leadman_review",
       diagnosis: appendText(job.diagnosis, diagnosis),
       work_performed: appendText(job.work_performed, workPerformed || notes),
+    };
+  }
+
+  if (action === "leadman_approve") {
+    if (!REVIEW_ROLES.has(profile.role)) {
+      return NextResponse.json({ error: "Only leadman or OATA operations roles can approve review." }, { status: 403 });
+    }
+    if (job.status !== "awaiting_leadman_review") {
+      return NextResponse.json({ error: `Work order can only be approved from awaiting_leadman_review. Current status: ${job.status}` }, { status: 409 });
+    }
+    updatePayload = {
+      status: "awaiting_client_signoff",
+      leadman_id: job.leadman_id ?? profile.id,
+      work_performed: appendText(job.work_performed, notes ? `Leadman approved for client sign-off: ${notes}` : `Leadman approved for client sign-off by ${profile.full_name}.`),
+    };
+  }
+
+  if (action === "send_back") {
+    if (!REVIEW_ROLES.has(profile.role)) {
+      return NextResponse.json({ error: "Only leadman or OATA operations roles can send work back." }, { status: 403 });
+    }
+    if (job.status !== "awaiting_leadman_review") {
+      return NextResponse.json({ error: `Work order can only be sent back from awaiting_leadman_review. Current status: ${job.status}` }, { status: 409 });
+    }
+    if (!notes) {
+      return NextResponse.json({ error: "Leadman send-back reason is required." }, { status: 400 });
+    }
+    updatePayload = {
+      status: "in_progress",
+      leadman_id: job.leadman_id ?? profile.id,
+      work_performed: appendText(job.work_performed, `Leadman sent back for correction: ${notes}`),
     };
   }
 

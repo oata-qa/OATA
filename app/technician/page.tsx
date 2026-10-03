@@ -209,7 +209,10 @@ export default function TechnicianApp() {
               <h1 className="mt-1 text-3xl font-semibold tracking-[-0.05em]">Today</h1>
               {profile && <p className="mt-1 text-xs text-slate-500">{profile.full_name} · {profile.role.replace(/_/g, " ")}</p>}
             </div>
-            <Link href="/" className="rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700">Admin</Link>
+            <div className="flex flex-wrap gap-2">
+              <Link href="/oata/review" className="rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700">Review</Link>
+              <Link href="/" className="rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700">Admin</Link>
+            </div>
           </div>
         </header>
 
@@ -282,6 +285,7 @@ export default function TechnicianApp() {
               </div>
 
               <div className="mt-4 grid gap-2">
+                <Link href={`/jobs/${activeJob.id}`} className="rounded-2xl border border-cyan-200 bg-cyan-50 px-4 py-3 text-center text-sm font-semibold text-cyan-800">Upload / Check Evidence Photos</Link>
                 {activeJob.status === "created" && <button onClick={() => updateJob(activeJob, "accept")} disabled={busyId === activeJob.id} className="rounded-2xl border border-cyan-200 bg-cyan-50 px-4 py-3 text-sm font-semibold text-cyan-800 disabled:opacity-60">Accept Job</button>}
                 {["created", "assigned"].includes(activeJob.status) && <button onClick={() => updateJob(activeJob, "start")} disabled={busyId === activeJob.id} className="rounded-2xl bg-cyan-700 px-4 py-3 text-sm font-semibold text-white disabled:opacity-60">Start / On Site</button>}
                 {activeJob.status === "in_progress" && <button onClick={() => updateJob(activeJob, "submit_review")} disabled={busyId === activeJob.id} className="rounded-2xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white disabled:opacity-60">Submit for Leadman Review</button>}
