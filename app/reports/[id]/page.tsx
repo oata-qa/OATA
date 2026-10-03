@@ -89,6 +89,7 @@ export default function ReportPage() {
   const [report, setReport] = useState<ReportData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -114,6 +115,37 @@ export default function ReportPage() {
     }
     load();
   }, [jobId]);
+
+  async function downloadPdf() {
+    setDownloading(true);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      if (!token) {
+        setError("Your session expired. Please sign in again.");
+        return;
+      }
+      const res = await fetch(`/api/reports/${jobId}/pdf`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        setError(data?.error ?? "PDF download failed.");
+        return;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `${report?.job.job_number ?? "work-order"}-report.pdf`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(url);
+    } finally {
+      setDownloading(false);
+    }
+  }
 
   if (loading) {
     return <main className="flex min-h-screen items-center justify-center bg-slate-50 text-slate-500"><p>Preparing OATA report…</p></main>;
@@ -142,12 +174,21 @@ export default function ReportPage() {
 
       <div className="no-print mx-auto mb-4 flex max-w-4xl items-center justify-between">
         <Link href="/" className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700">← Dashboard</Link>
-        <button
-          onClick={() => window.print()}
-          className="rounded-full bg-[#123747] px-5 py-2 text-sm font-semibold text-white hover:bg-[#1a4b5d]"
-        >
-          Print / Save as PDF
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={downloadPdf}
+            disabled={downloading}
+            className="rounded-full bg-[#327482] px-5 py-2 text-sm font-semibold text-white hover:bg-[#2a5f6c] disabled:opacity-60"
+          >
+            {downloading ? "Preparing PDF…" : "Download PDF"}
+          </button>
+          <button
+            onClick={() => window.print()}
+            className="rounded-full bg-[#123747] px-5 py-2 text-sm font-semibold text-white hover:bg-[#1a4b5d]"
+          >
+            Print / Save as PDF
+          </button>
+        </div>
       </div>
 
       <article className="mx-auto max-w-4xl overflow-hidden rounded-2xl bg-white shadow-xl print:max-w-none print:rounded-none print:shadow-none">
