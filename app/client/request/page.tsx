@@ -59,6 +59,21 @@ function priorityClass(priority: string | null) {
   return "border-blue-200 bg-blue-50 text-blue-700";
 }
 
+function mediaTypeFor(file: File) {
+  if (file.type.startsWith("image/")) return "photo";
+  if (file.type.startsWith("video/")) return "video";
+  if (file.type === "application/pdf") return "document";
+  return "other";
+}
+
+function safeFileName(name: string) {
+  const cleaned = name.toLowerCase().replace(/[^a-z0-9._-]+/g, "-").replace(/-+/g, "-");
+  return cleaned || "evidence-file";
+}
+
+const MAX_EVIDENCE_FILES = 5;
+const MAX_EVIDENCE_SIZE_MB = 12;
+
 export default function ClientRequestPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -68,6 +83,8 @@ export default function ClientRequestPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
+  const [uploadMessage, setUploadMessage] = useState("");
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [createdRequest, setCreatedRequest] = useState<CreatedRequest | null>(null);
 
   const [companyId, setCompanyId] = useState("");
@@ -149,9 +166,79 @@ export default function ClientRequestPage() {
     });
   }, [contracts, serviceCategory]);
 
+  async function uploadEvidenceFiles(requestId: string, token: string) {
+    if (!selectedFiles.length) return;
+
+    let uploaded = 0;
+    setUploadMessage(`Uploading ${selectedFiles.length} evidence file${selectedFiles.length === 1 ? "" : "s"}...`);
+
+    for (const file of selectedFiles) {
+      const path = `service-requests/${requestId}/${Date.now()}-${safeFileName(file.name)}`;
+      const { error: uploadError } = await supabase.storage.from("job-photos").upload(path, file, {
+        cacheControl: "3600",
+        upsert: false,
+      });
+
+      if (uploadError) {
+        throw new Error(`Evidence upload failed for ${file.name}: ${uploadError.message}`);
+      }
+
+      const response = await fetch("/api/service-requests/media", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          service_request_id: requestId,
+          media_type: mediaTypeFor(file),
+          storage_bucket: "job-photos",
+          storage_path: path,
+          caption: file.name,
+        }),
+      });
+
+      const result = await response.json().catch(() => null);
+      if (!response.ok) {
+        throw new Error(result?.error ?? `Evidence registration failed for ${file.name}.`);
+      }
+      uploaded += 1;
+      setUploadMessage(`Uploaded ${uploaded}/${selectedFiles.length} evidence file${selectedFiles.length === 1 ? "" : "s"}.`);
+    }
+  }
+
+  function handleFileSelection(files: FileList | null) {
+    setUploadMessage("");
+    if (!files?.length) {
+      setSelectedFiles([]);
+      return;
+    }
+
+    const chosen = Array.from(files).slice(0, MAX_EVIDENCE_FILES);
+    const nonImage = chosen.find((file) => !file.type.startsWith("image/"));
+    if (nonImage) {
+      setSelectedFiles([]);
+      setUploadMessage(`${nonImage.name} is not an image. Please upload photo evidence only.`);
+      return;
+    }
+
+    const oversize = chosen.find((file) => file.size > MAX_EVIDENCE_SIZE_MB * 1024 * 1024);
+    if (oversize) {
+      setSelectedFiles([]);
+      setUploadMessage(`${oversize.name} is too large. Maximum file size is ${MAX_EVIDENCE_SIZE_MB} MB.`);
+      return;
+    }
+
+    setSelectedFiles(chosen);
+    if (files.length > MAX_EVIDENCE_FILES) {
+      setUploadMessage(`Only the first ${MAX_EVIDENCE_FILES} files were selected.`);
+    }
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setMessage("");
+    setUploadMessage("");
     setCreatedRequest(null);
 
     if (!description.trim() || description.trim().length < 12) {
@@ -195,8 +282,22 @@ export default function ClientRequestPage() {
       return;
     }
 
-    setCreatedRequest(result.request as CreatedRequest);
-    setMessage("Service request submitted. It is awaiting manager approval before OATA converts it to a work order.");
+    const created = result.request as CreatedRequest;
+    setCreatedRequest(created);
+
+    try {
+      await uploadEvidenceFiles(created.id, token);
+      setMessage(
+        selectedFiles.length
+          ? "Service request submitted with evidence files. It is awaiting manager approval before OATA converts it to a work order."
+          : "Service request submitted. It is awaiting manager approval before OATA converts it to a work order.",
+      );
+      setSelectedFiles([]);
+    } catch (uploadError) {
+      setMessage("Service request submitted, but evidence upload needs attention.");
+      setUploadMessage(uploadError instanceof Error ? uploadError.message : "Evidence upload failed.");
+    }
+
     setDescription("");
     setArea("");
     setEquipmentId("");
@@ -324,6 +425,42 @@ export default function ClientRequestPage() {
             <span className="text-sm font-semibold text-slate-700">What happened?</span>
             <textarea value={description} onChange={(event) => setDescription(event.target.value)} rows={6} placeholder="Example: Main kitchen hood has heavy grease accumulation and the exhaust airflow feels weak during operation." className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm leading-6 outline-none focus:border-[#327482]" />
           </label>
+
+          <div className="mt-5 rounded-3xl border border-dashed border-[#327482]/35 bg-[#f8fdfe] p-5">
+            <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+              <div>
+                <p className="text-sm font-semibold text-[#123747]">Evidence photos</p>
+                <p className="mt-1 max-w-xl text-xs leading-5 text-slate-500">
+                  Optional but recommended. Add up to {MAX_EVIDENCE_FILES} photos. These help OATA confirm urgency and prepare the technician before dispatch.
+                </p>
+              </div>
+              <label className="inline-flex cursor-pointer items-center justify-center rounded-full border border-[#327482]/30 bg-white px-4 py-2 text-sm font-semibold text-[#327482] hover:bg-[#f0fbfc]">
+                Choose photos
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(event) => handleFileSelection(event.target.files)}
+                />
+              </label>
+            </div>
+
+            {selectedFiles.length > 0 && (
+              <div className="mt-4 grid gap-2">
+                {selectedFiles.map((file) => (
+                  <div key={`${file.name}-${file.size}`} className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm">
+                    <span className="truncate font-medium text-slate-700">{file.name}</span>
+                    <span className="ml-3 shrink-0 text-xs text-slate-400">{(file.size / 1024 / 1024).toFixed(2)} MB</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {uploadMessage && (
+              <p className="mt-3 text-xs font-medium text-[#327482]">{uploadMessage}</p>
+            )}
+          </div>
 
           <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-slate-100 pt-5">
             <p className="max-w-xl text-xs leading-5 text-slate-500">
