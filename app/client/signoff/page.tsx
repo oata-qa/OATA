@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { supabase, badgeClass, categoryLabel, statusLabel } from "@/lib/supabase";
+import { OataHero, OataLoading, OataPageShell } from "@/components/oata-page-shell";
 
 type Profile = {
   id: string;
@@ -199,32 +200,22 @@ export default function ClientSignoffPage() {
   }
 
   if (loading) {
-    return <main className="flex min-h-screen items-center justify-center bg-slate-50 text-slate-700"><p>Loading client sign-off queue...</p></main>;
+    return <OataLoading label="Loading client sign-off queue..." />;
   }
 
   const waitingJobs = jobs.filter((job) => job.status === "awaiting_client_signoff");
   const completedJobs = jobs.filter((job) => job.status === "completed");
 
   return (
-    <main className="min-h-screen bg-[#eef3f6] px-4 py-6 text-slate-950 sm:px-6 lg:px-8">
-      <section className="mx-auto max-w-6xl space-y-6">
-        <header className="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-slate-200">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-700">Client Completion</p>
-              <h1 className="mt-2 text-3xl font-semibold tracking-[-0.05em] text-slate-950">Client Sign-off</h1>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-                Review OATA work evidence and approve completed work. After sign-off, the job is closed and report/certificate readiness is marked.
-              </p>
-              {profile && <p className="mt-3 text-xs text-slate-500">Signed in: {profile.full_name} · {profile.role.replace(/_/g, " ")}</p>}
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Link href="/client" className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700">Client Portal</Link>
-              <Link href="/oata/review" className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700">OATA Review</Link>
-              <Link href="/" className="rounded-full bg-cyan-700 px-4 py-2 text-sm font-semibold text-white">Dashboard</Link>
-            </div>
-          </div>
-        </header>
+    <OataPageShell
+      eyebrow="Client Completion"
+      title="Client Sign-off"
+      description="Review OATA work evidence and approve completed work. After sign-off, the job is closed and report/certificate readiness is marked."
+      userLabel={profile ? `${profile.full_name} · ${profile.role.replace(/_/g, " ")}` : null}
+      actions={[{ label: "Client Portal", href: "/client", variant: "ghost" }, { label: "OATA Review", href: "/oata/review", variant: "ghost" }, { label: "Dashboard", href: "/", variant: "primary" }]}
+      maxWidth="6xl"
+    >
+      <div className="space-y-6">
 
         {message && <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">{message}</div>}
 
@@ -336,7 +327,7 @@ export default function ClientSignoffPage() {
             );
           })}
         </section>
-      </section>
-    </main>
+      </div>
+    </OataPageShell>
   );
 }

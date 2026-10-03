@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { supabase, badgeClass, categoryLabel, statusLabel } from "@/lib/supabase";
+import { OataHero, OataLoading, OataPageShell } from "@/components/oata-page-shell";
 
 type Profile = {
   id: string;
@@ -185,29 +186,19 @@ export default function LeadmanReviewPage() {
   }
 
   if (loading) {
-    return <main className="flex min-h-screen items-center justify-center bg-slate-950 text-white"><p>Loading leadman review queue...</p></main>;
+    return <OataLoading label="Loading leadman review queue..." />;
   }
 
   return (
-    <main className="min-h-screen bg-slate-100 px-4 py-6 text-slate-950 sm:px-6 lg:px-8">
-      <section className="mx-auto max-w-6xl space-y-6">
-        <header className="rounded-[2rem] bg-slate-950 p-6 text-white shadow-xl">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-200">OATA Quality Control</p>
-              <h1 className="mt-2 text-3xl font-semibold tracking-[-0.05em]">Leadman Review</h1>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">
-                Review technician evidence, diagnosis, and work performed before releasing the job for client sign-off.
-              </p>
-              {profile && <p className="mt-3 text-xs text-slate-400">Signed in: {profile.full_name} · {profile.role.replace(/_/g, " ")}</p>}
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Link href="/technician" className="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white">Technician</Link>
-              <Link href="/oata/dispatch" className="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white">Dispatch</Link>
-              <Link href="/" className="rounded-full bg-cyan-500 px-4 py-2 text-sm font-semibold text-white">Dashboard</Link>
-            </div>
-          </div>
-        </header>
+    <OataPageShell
+      eyebrow="OATA Quality Control"
+      title="Leadman Review"
+      description="Review technician evidence, diagnosis, and work performed before releasing the job for client sign-off."
+      userLabel={profile ? `${profile.full_name} · ${profile.role.replace(/_/g, " ")}` : null}
+      actions={[{ label: "Technician", href: "/technician", variant: "ghost" }, { label: "Dispatch", href: "/oata/dispatch", variant: "ghost" }, { label: "Dashboard", href: "/", variant: "primary" }]}
+      maxWidth="6xl"
+    >
+      <div className="space-y-6">
 
         {message && <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">{message}</div>}
 
@@ -300,7 +291,7 @@ export default function LeadmanReviewPage() {
             );
           })}
         </section>
-      </section>
-    </main>
+      </div>
+    </OataPageShell>
   );
 }

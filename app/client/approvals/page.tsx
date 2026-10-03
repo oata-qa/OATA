@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { supabase, badgeClass, categoryLabel, statusLabel } from "@/lib/supabase";
+import { OataHero, OataLoading, OataPageShell } from "@/components/oata-page-shell";
 
 type Profile = {
   id: string;
@@ -197,68 +198,23 @@ export default function ClientApprovalsPage() {
   }
 
   if (loading) {
-    return (
-      <main className="flex min-h-screen items-center justify-center bg-[#f3f7f8]">
-        <p className="text-slate-500">Loading approvals...</p>
-      </main>
-    );
+    return <OataLoading label="Loading approvals..." />;
   }
 
   return (
-    <main className="min-h-screen bg-[#f3f7f8] text-slate-950">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-7xl flex-col gap-5 px-5 py-5 lg:flex-row lg:items-center lg:justify-between lg:px-8">
-          <div className="flex items-center gap-4">
-            <img src="/oata-logo.png" alt="OATA" className="h-20 w-auto" />
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#327482]">Manager Approvals</p>
-              <h1 className="text-2xl font-semibold tracking-[-0.04em] text-[#123747]">Approve requests before work orders</h1>
-            </div>
-          </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-600">
-              {profile?.full_name ?? "Client"} · <span className="font-semibold text-[#327482]">{fmt(profile?.role)}</span>
-            </div>
-            <Link href="/oata/dispatch" className="rounded-full bg-[#D6A641] px-4 py-2 text-sm font-semibold text-[#123747] hover:bg-[#e3bb62]">
-              Dispatch Queue
-            </Link>
-            <Link href="/client/request" className="rounded-full bg-[#D6A641] px-4 py-2 text-sm font-semibold text-[#123747] hover:bg-[#e3bb62]">
-              New Request
-            </Link>
-            <Link href="/client" className="rounded-full bg-[#123747] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1a4b5d]">
-              Client Portal
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <section className="mx-auto max-w-7xl px-5 py-6 lg:px-8">
-        <div className="rounded-[2rem] bg-[#123747] p-6 text-white shadow-xl shadow-slate-900/10 lg:p-8">
-          <div className="grid gap-6 lg:grid-cols-[1fr_0.85fr] lg:items-end">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[#9deaf2]">Control point</p>
-              <h2 className="mt-4 max-w-3xl text-4xl font-semibold tracking-[-0.06em] sm:text-5xl">
-                Manager approval comes before OATA dispatch and work order creation.
-              </h2>
-              <p className="mt-4 max-w-2xl text-sm leading-6 text-white/72">
-                Approving a request does not mean the work is completed. It means the client manager agrees OATA may dispatch/review it.
-              </p>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-3">
-              {[
-                ["Pending", String(pendingRequests.length), "Need decision"],
-                ["Urgent", String(urgentCount), "Priority attention"],
-                ["Reviewed", String(decidedRequests.length), "Recent decisions"],
-              ].map(([title, value, detail]) => (
-                <div key={title} className="rounded-2xl border border-white/12 bg-white/[0.08] p-4">
-                  <p className="text-sm text-white/66">{title}</p>
-                  <p className="mt-1 text-3xl font-semibold tracking-[-0.05em] text-white">{value}</p>
-                  <p className="mt-1 text-xs text-white/58">{detail}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+    <OataPageShell
+      eyebrow="Manager Approvals"
+      title="Approve requests before work orders"
+      description="Approve the request only. OATA dispatch still controls work-order creation."
+      userLabel={`${profile?.full_name ?? "Client"} · ${fmt(profile?.role)}`}
+      actions={[{ label: "Dispatch Queue", href: "/oata/dispatch", variant: "gold" }, { label: "New Request", href: "/client/request", variant: "gold" }, { label: "Client Portal", href: "/client", variant: "primary" }]}
+    >
+        <OataHero
+          eyebrow="Control point"
+          title="Manager approval comes before OATA dispatch and work order creation."
+          description="Approving a request does not mean the work is completed. It means the client manager agrees OATA may dispatch/review it."
+          stats={[["Pending", String(pendingRequests.length), "Need decision"], ["Urgent", String(urgentCount), "Priority attention"], ["Reviewed", String(decidedRequests.length), "Recent decisions"]]}
+        />
 
         {message && (
           <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
@@ -394,7 +350,6 @@ export default function ClientApprovalsPage() {
             </div>
           </aside>
         </div>
-      </section>
-    </main>
+    </OataPageShell>
   );
 }

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { supabase, badgeClass, categoryLabel, statusLabel } from "@/lib/supabase";
+import { OataLoading, OataPageShell } from "@/components/oata-page-shell";
 
 type ReportJob = {
   id: string;
@@ -88,24 +89,18 @@ export default function ReportsPage() {
   const equipmentMap = useMemo(() => byId(equipment), [equipment]);
 
   if (loading) {
-    return <main className="flex min-h-screen items-center justify-center bg-slate-50 text-slate-500"><p>Loading reports…</p></main>;
+    return <OataLoading label="Loading reports..." />;
   }
 
   return (
-    <main className="min-h-screen bg-[#eef3f6] px-4 py-6 text-slate-950 sm:px-6 lg:px-8">
-      <section className="mx-auto max-w-5xl space-y-6">
-        <header className="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-slate-200">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-700">Service Records</p>
-              <h1 className="mt-2 text-3xl font-semibold tracking-[-0.05em] text-slate-950">Reports & Certificates</h1>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-                Completed work orders with client sign-off are ready for report/certificate download.
-              </p>
-            </div>
-            <Link href="/" className="rounded-full bg-[#123747] px-4 py-2 text-sm font-semibold text-white">Dashboard</Link>
-          </div>
-        </header>
+    <OataPageShell
+      eyebrow="Service Records"
+      title="Reports & Certificates"
+      description="Completed work orders with client sign-off are ready for report/certificate download."
+      actions={[{ label: "Dashboard", href: "/", variant: "primary" }]}
+      maxWidth="5xl"
+    >
+      <div className="space-y-6">
 
         {message && <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">{message}</div>}
 
@@ -146,7 +141,7 @@ export default function ReportsPage() {
             );
           })}
         </section>
-      </section>
-    </main>
+      </div>
+    </OataPageShell>
   );
 }

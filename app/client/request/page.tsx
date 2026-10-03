@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { supabase, categoryLabel, SERVICE_CATEGORIES } from "@/lib/supabase";
+import { OataHero, OataLoading, OataPageShell } from "@/components/oata-page-shell";
 
 type Profile = {
   id: string;
@@ -304,39 +305,19 @@ export default function ClientRequestPage() {
   }
 
   if (loading) {
-    return (
-      <main className="flex min-h-screen items-center justify-center bg-[#f3f7f8]">
-        <p className="text-slate-500">Loading request form...</p>
-      </main>
-    );
+    return <OataLoading label="Loading request form..." />;
   }
 
   return (
-    <main className="min-h-screen bg-[#f3f7f8] text-slate-950">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-6xl flex-col gap-5 px-5 py-5 lg:flex-row lg:items-center lg:justify-between lg:px-8">
-          <div className="flex items-center gap-4">
-            <img src="/oata-logo.png" alt="OATA" className="h-20 w-auto" />
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#327482]">New Service Request</p>
-              <h1 className="text-2xl font-semibold tracking-[-0.04em] text-[#123747]">Tell OATA what happened</h1>
-            </div>
-          </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-600">
-              {profile?.full_name ?? "Client User"} · <span className="font-semibold text-[#327482]">{label(profile?.role)}</span>
-            </div>
-            <Link href="/client/approvals" className="rounded-full border border-[#327482]/30 bg-white px-4 py-2 text-sm font-semibold text-[#327482] hover:bg-[#f0fbfc]">
-              Approvals
-            </Link>
-            <Link href="/client" className="rounded-full bg-[#123747] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1a4b5d]">
-              Client Portal
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <section className="mx-auto grid max-w-6xl gap-6 px-5 py-6 lg:grid-cols-[0.72fr_0.28fr] lg:px-8">
+    <OataPageShell
+      eyebrow="New Service Request"
+      title="Tell OATA what happened"
+      description="Create a controlled service request for manager approval before OATA dispatch."
+      userLabel={`${profile?.full_name ?? "Client User"} · ${label(profile?.role)}`}
+      actions={[{ label: "Approvals", href: "/client/approvals", variant: "ghost" }, { label: "Client Portal", href: "/client", variant: "primary" }]}
+      maxWidth="6xl"
+    >
+      <div className="grid gap-6 lg:grid-cols-[0.72fr_0.28fr]">
         <form onSubmit={handleSubmit} className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm lg:p-7">
           <div className="border-b border-slate-100 pb-5">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#327482]">Service Request ≠ Work Order</p>
@@ -505,7 +486,7 @@ export default function ClientRequestPage() {
             </p>
           </div>
         </aside>
-      </section>
-    </main>
+      </div>
+    </OataPageShell>
   );
 }

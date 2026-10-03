@@ -128,12 +128,12 @@ export default function ReportPage() {
   }
 
   if (loading) {
-    return <main className="flex min-h-screen items-center justify-center bg-slate-50 text-slate-500"><p>Preparing OATA report…</p></main>;
+    return <main className="flex min-h-screen items-center justify-center bg-[#eef5f8] text-[#123747]"><div className="rounded-3xl border border-slate-200 bg-white px-6 py-5 text-center shadow-sm"><p className="text-sm font-semibold">Preparing OATA report...</p><p className="mt-1 text-xs text-slate-400">Loading secure report data.</p></div></main>;
   }
 
   if (error || !report) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
+      <main className="flex min-h-screen items-center justify-center bg-[#eef5f8] px-4">
         <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-center">
           <p className="text-lg font-semibold text-red-700">Report unavailable</p>
           <p className="mt-2 text-sm text-red-600">{error ?? "No report data."}</p>
@@ -149,7 +149,7 @@ export default function ReportPage() {
     : `${categoryLabel(job.service_category ?? job.job_type)} Report`;
 
   return (
-    <main className="min-h-screen bg-slate-200 px-4 py-6 text-slate-950 print:bg-white print:p-0">
+    <main className="min-h-screen bg-[#eef5f8] px-4 py-6 text-slate-950 print:bg-white print:p-0">
       <style>{`@media print { .no-print { display: none !important; } }`}</style>
 
       <div className="no-print mx-auto mb-4 flex max-w-4xl items-center justify-between">

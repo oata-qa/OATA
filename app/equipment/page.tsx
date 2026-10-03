@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
 import { supabase, badgeClass, categoryLabel, fetchWithNames, type EquipmentRow, type Profile } from "@/lib/supabase";
+import { OataLoading, OataPageShell } from "@/components/oata-page-shell";
 
 type EquipmentWithName = EquipmentRow & {
   company_name: string;
@@ -55,36 +56,19 @@ export default function EquipmentPage() {
   }
 
   if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50">
-        <p className="text-slate-400">Loading equipment...</p>
-      </div>
-    );
+    return <OataLoading label="Loading equipment..." />;
   }
 
   return (
-    <div className="min-h-screen bg-[#eef3f6] text-slate-950">
-      {/* Header */}
-      <header className="sticky top-0 z-20 border-b border-slate-200 bg-[#eef3f6]/90 px-5 py-4 backdrop-blur lg:px-8">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <button onClick={() => router.push("/")} className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
-              ← Dashboard
-            </button>
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-cyan-700">Asset Register</p>
-              <h1 className="text-xl font-bold tracking-[-0.03em]">Equipment & QR Codes</h1>
-            </div>
-          </div>
-          {profile && (
-            <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-600">
-              {profile.full_name} · {profile.role}
-            </span>
-          )}
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-5xl space-y-6 px-5 py-6 lg:px-8">
+    <OataPageShell
+      eyebrow="Asset Register"
+      title="Equipment & QR Codes"
+      description="Registered assets, QR access, service category, location, and service history entry points."
+      userLabel={profile ? `${profile.full_name} · ${profile.role}` : null}
+      actions={[{ label: "Dashboard", href: "/", variant: "primary" }]}
+      maxWidth="5xl"
+    >
+      <div className="space-y-6">
         {error && (
           <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">
             Error: {error}
@@ -154,7 +138,7 @@ export default function EquipmentPage() {
             ))}
           </div>
         )}
-      </main>
-    </div>
+      </div>
+    </OataPageShell>
   );
 }

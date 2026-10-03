@@ -427,7 +427,7 @@ export default function Home() {
             <img src="/oata-logo.png" alt="OATA" className="h-20 w-auto" />
             <div className="hidden h-10 w-px bg-slate-200 sm:block" />
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#327482]">Care Portal</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#327482]">OATA Care Portal</p>
               <h1 className="text-2xl font-semibold tracking-[-0.04em] text-[#123747]">Operations Dashboard</h1>
             </div>
           </div>
