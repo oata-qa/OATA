@@ -67,10 +67,10 @@ const technicalTypes = ["kitchen_equipment", "refrigeration", "hvac", "coffee_ma
 const cleaningTypes = ["hood_cleaning", "duct_cleaning", "grease_trap", "drainage", "water_tank", "ecology_unit"];
 
 const primaryActions = [
+  { label: "Dispatch Queue", detail: "Approved requests to work orders", href: "/oata/dispatch" },
   { label: "Client Portal", detail: "Contracts, restaurants, approvals", href: "/client" },
   { label: "Equipment Register", detail: "Assets, QR codes, history", href: "/equipment" },
-  { label: "Reports", detail: "Certificates and job proof", href: "#" },
-  { label: "Approvals", detail: "Quotes, parts, completion", href: "#approvals" },
+  { label: "Approvals", detail: "Requests, quotes, parts", href: "/client/approvals" },
 ];
 
 function formatLabel(value: string | null | undefined) {
