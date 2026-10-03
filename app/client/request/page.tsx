@@ -225,6 +225,9 @@ export default function ClientRequestPage() {
             <div className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-600">
               {profile?.full_name ?? "Client User"} · <span className="font-semibold text-[#327482]">{label(profile?.role)}</span>
             </div>
+            <Link href="/client/approvals" className="rounded-full border border-[#327482]/30 bg-white px-4 py-2 text-sm font-semibold text-[#327482] hover:bg-[#f0fbfc]">
+              Approvals
+            </Link>
             <Link href="/client" className="rounded-full bg-[#123747] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1a4b5d]">
               Client Portal
             </Link>
