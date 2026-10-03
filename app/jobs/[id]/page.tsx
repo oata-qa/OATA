@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import { supabase, badgeClass, statusLabel, categoryLabel, fetchWithNames, type ServiceJobRow, type JobPhoto, type Profile } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
 
@@ -431,6 +432,9 @@ export default function JobDetailPage() {
                 Status: {statusLabel(job.report_status ?? "ready")}. OATA can now prepare the final report/certificate package.
               </p>
               {job.verification_result && <p className="mt-2 text-sm text-emerald-900">{job.verification_result}</p>}
+              <Link href={`/reports/${job.id}`} className="mt-3 inline-block rounded-xl bg-[#123747] px-4 py-2 text-sm font-semibold text-white">
+                View Report / Certificate
+              </Link>
             </div>
           </section>
         )}

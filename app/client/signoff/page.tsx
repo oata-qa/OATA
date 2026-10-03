@@ -306,6 +306,9 @@ export default function ClientSignoffPage() {
                         <p className="font-semibold">Signed off by {job.client_signoff_name ?? "client"}</p>
                         <p className="mt-1">Date: {dateLabel(job.client_signoff_at)}</p>
                         <p className="mt-1">Report / certificate status: {statusLabel(job.report_status ?? "ready")}</p>
+                        <Link href={`/reports/${job.id}`} className="mt-3 inline-block rounded-xl bg-[#123747] px-4 py-2 text-sm font-semibold text-white">
+                          View Report / Certificate
+                        </Link>
                       </div>
                     ) : (
                       <div className="space-y-3">
