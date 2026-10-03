@@ -198,6 +198,9 @@ export default function ClientPortalPage() {
             <div className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-600">
               {profile?.full_name ?? "Client"} · <span className="font-semibold text-[#327482]">{fmt(profile?.role)}</span>
             </div>
+            <Link href="/client/request" className="rounded-full bg-[#D6A641] px-4 py-2 text-sm font-semibold text-[#123747] hover:bg-[#e3bb62]">
+              New Request
+            </Link>
             <Link href="/" className="rounded-full bg-[#123747] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1a4b5d]">
               Dashboard
             </Link>
