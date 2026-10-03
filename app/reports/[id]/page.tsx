@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { supabase, badgeClass, statusLabel, categoryLabel } from "@/lib/supabase";
+import { downloadReportPdf } from "@/lib/report-pdf";
 
 type ReportJob = {
   job_number: string | null;
@@ -116,32 +117,11 @@ export default function ReportPage() {
     load();
   }, [jobId]);
 
-  async function downloadPdf() {
+  function downloadPdf() {
+    if (!report) return;
     setDownloading(true);
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const token = sessionData.session?.access_token;
-      if (!token) {
-        setError("Your session expired. Please sign in again.");
-        return;
-      }
-      const res = await fetch(`/api/reports/${jobId}/pdf`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => null);
-        setError(data?.error ?? "PDF download failed.");
-        return;
-      }
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const anchor = document.createElement("a");
-      anchor.href = url;
-      anchor.download = `${report?.job.job_number ?? "work-order"}-report.pdf`;
-      document.body.appendChild(anchor);
-      anchor.click();
-      anchor.remove();
-      URL.revokeObjectURL(url);
+      downloadReportPdf(report);
     } finally {
       setDownloading(false);
     }

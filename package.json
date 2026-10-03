@@ -10,9 +10,9 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@react-pdf/renderer": "^4.9.0",
     "@supabase/supabase-js": "^2.117.2",
     "next": "^15.5.27",
+    "pdfmake": "^0.2.23",
     "qrcode.react": "^4.2.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
