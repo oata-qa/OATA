@@ -204,6 +204,9 @@ export default function ClientPortalPage() {
             <Link href="/client/approvals" className="rounded-full border border-[#327482]/30 bg-white px-4 py-2 text-sm font-semibold text-[#327482] hover:bg-[#f0fbfc]">
               Approvals
             </Link>
+            <Link href="/client/signoff" className="rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 hover:bg-emerald-100">
+              Sign-off
+            </Link>
             <Link href="/" className="rounded-full bg-[#123747] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1a4b5d]">
               Dashboard
             </Link>

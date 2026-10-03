@@ -15,13 +15,15 @@ const STAFF_ROLES = new Set([
 
 const FIELD_ROLES = new Set(["technician", "leadman", "head_of_technical", "hvac_ecology_supervisor"]);
 const REVIEW_ROLES = new Set(["oata_admin", "oata_manager", "head_of_technical", "hvac_ecology_supervisor", "leadman"]);
+const CLIENT_SIGNOFF_ROLES = new Set(["client_gm", "client_branch_manager", "client_finance", "client_user"]);
 
 type StatusPayload = {
   job_id?: string;
-  action?: "accept" | "start" | "submit_review" | "leadman_approve" | "send_back";
+  action?: "accept" | "start" | "submit_review" | "leadman_approve" | "send_back" | "client_signoff";
   notes?: string | null;
   diagnosis?: string | null;
   work_performed?: string | null;
+  signer_name?: string | null;
 };
 
 function normalize(value: unknown) {
@@ -67,7 +69,7 @@ export async function POST(request: NextRequest) {
   const jobId = normalize(payload.job_id);
   const action = payload.action;
 
-  if (!jobId || !action || !["accept", "start", "submit_review", "leadman_approve", "send_back"].includes(action)) {
+  if (!jobId || !action || !["accept", "start", "submit_review", "leadman_approve", "send_back", "client_signoff"].includes(action)) {
     return NextResponse.json({ error: "Job ID and valid action are required." }, { status: 400 });
   }
 
@@ -81,13 +83,21 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Active OATA profile required to update work orders." }, { status: 403 });
   }
 
-  if (!STAFF_ROLES.has(profile.role) && !FIELD_ROLES.has(profile.role)) {
-    return NextResponse.json({ error: "Only OATA field/operations roles can update work orders." }, { status: 403 });
+  const isClientSignoffAction = action === "client_signoff";
+
+  if (!STAFF_ROLES.has(profile.role) && !FIELD_ROLES.has(profile.role) && !(isClientSignoffAction && CLIENT_SIGNOFF_ROLES.has(profile.role))) {
+    return NextResponse.json({ error: "Only authorized OATA or client roles can update work orders." }, { status: 403 });
   }
+
+  const { data: visibleJob } = await userClient
+    .from("service_jobs")
+    .select("id")
+    .eq("id", jobId)
+    .maybeSingle();
 
   const { data: job, error: jobError } = await serviceClient
     .from("service_jobs")
-    .select("id, job_number, status, assigned_to, leadman_id, diagnosis, work_performed, started_at, accepted_at, on_site_at")
+    .select("id, job_number, status, assigned_to, leadman_id, diagnosis, work_performed, started_at, accepted_at, on_site_at, client_signoff_name, report_status")
     .eq("id", jobId)
     .maybeSingle();
 
@@ -98,16 +108,22 @@ export async function POST(request: NextRequest) {
   const isStaff = STAFF_ROLES.has(profile.role);
   const isAssignedTechnician = job.assigned_to === profile.id;
   const isAssignedLeadman = job.leadman_id === profile.id;
-  const canTouch = isStaff || isAssignedTechnician || isAssignedLeadman || (!job.assigned_to && FIELD_ROLES.has(profile.role));
+  const canClientSignoff = isClientSignoffAction && (isStaff || (CLIENT_SIGNOFF_ROLES.has(profile.role) && Boolean(visibleJob)));
+  const canTouch = isStaff || isAssignedTechnician || isAssignedLeadman || (!job.assigned_to && FIELD_ROLES.has(profile.role)) || canClientSignoff;
 
   if (!canTouch) {
     return NextResponse.json({ error: "You are not assigned or authorized for this work order." }, { status: 403 });
+  }
+
+  if (isClientSignoffAction && !canClientSignoff) {
+    return NextResponse.json({ error: "You do not have client sign-off access for this work order." }, { status: 403 });
   }
 
   const now = new Date().toISOString();
   const notes = normalize(payload.notes);
   const diagnosis = normalize(payload.diagnosis);
   const workPerformed = normalize(payload.work_performed);
+  const signerName = normalize(payload.signer_name) || profile.full_name;
 
   let updatePayload: Record<string, string | null> = {};
 
@@ -182,11 +198,27 @@ export async function POST(request: NextRequest) {
     };
   }
 
+  if (action === "client_signoff") {
+    if (job.status !== "awaiting_client_signoff") {
+      return NextResponse.json({ error: `Work order can only be signed off from awaiting_client_signoff. Current status: ${job.status}` }, { status: 409 });
+    }
+    updatePayload = {
+      status: "completed",
+      client_signoff_name: signerName,
+      client_signoff_at: now,
+      completed_at: now,
+      closed_at: now,
+      verification_result: notes ? `Client sign-off accepted: ${notes}` : "Client sign-off accepted.",
+      report_status: "ready",
+      work_performed: appendText(job.work_performed, notes ? `Client signed off by ${signerName}: ${notes}` : `Client signed off by ${signerName}.`),
+    };
+  }
+
   const { data: updatedJob, error: updateError } = await serviceClient
     .from("service_jobs")
     .update(updatePayload)
     .eq("id", jobId)
-    .select("id, job_number, status, priority, accepted_at, started_at, on_site_at, diagnosis, work_performed, assigned_to, leadman_id")
+    .select("id, job_number, status, priority, accepted_at, started_at, on_site_at, completed_at, closed_at, client_signoff_name, client_signoff_at, verification_result, report_status, diagnosis, work_performed, assigned_to, leadman_id")
     .single();
 
   if (updateError) {

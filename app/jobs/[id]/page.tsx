@@ -256,6 +256,14 @@ export default function JobDetailPage() {
               <p className="text-xs text-slate-400">Scheduled</p>
               <p className="font-medium">{job.scheduled_at ? new Date(job.scheduled_at).toLocaleString() : "Not scheduled"}</p>
             </div>
+            <div>
+              <p className="text-xs text-slate-400">Report Status</p>
+              <p className="font-medium">{statusLabel(job.report_status ?? "not_started")}</p>
+            </div>
+            <div>
+              <p className="text-xs text-slate-400">Completed</p>
+              <p className="font-medium">{job.completed_at ? new Date(job.completed_at).toLocaleString() : "Not completed"}</p>
+            </div>
           </div>
 
           {job.complaint && (
@@ -416,6 +424,13 @@ export default function JobDetailPage() {
                   {job.client_signoff_at ? new Date(job.client_signoff_at).toLocaleString() : "—"}
                 </p>
               </div>
+            </div>
+            <div className="mt-4 rounded-2xl border border-emerald-200 bg-white/70 p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Report / Certificate Readiness</p>
+              <p className="mt-1 text-sm text-emerald-950">
+                Status: {statusLabel(job.report_status ?? "ready")}. OATA can now prepare the final report/certificate package.
+              </p>
+              {job.verification_result && <p className="mt-2 text-sm text-emerald-900">{job.verification_result}</p>}
             </div>
           </section>
         )}

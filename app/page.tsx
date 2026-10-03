@@ -69,6 +69,7 @@ const cleaningTypes = ["hood_cleaning", "duct_cleaning", "grease_trap", "drainag
 const primaryActions = [
   { label: "Dispatch Queue", detail: "Approved requests to work orders", href: "/oata/dispatch" },
   { label: "Leadman Review", detail: "Evidence and quality control", href: "/oata/review" },
+  { label: "Client Sign-off", detail: "Completion approval and report readiness", href: "/client/signoff" },
   { label: "Client Portal", detail: "Contracts, restaurants, approvals", href: "/client" },
   { label: "Equipment Register", detail: "Assets, QR codes, history", href: "/equipment" },
   { label: "Approvals", detail: "Requests, quotes, parts", href: "/client/approvals" },

@@ -35,6 +35,11 @@ export type ServiceJobRow = {
   leadman_id: string | null;
   client_signoff_name: string | null;
   client_signoff_at: string | null;
+  completed_at?: string | null;
+  verification_result?: string | null;
+  report_status?: string | null;
+  report_generated_at?: string | null;
+  closed_at?: string | null;
 };
 
 export type JobPhoto = {
