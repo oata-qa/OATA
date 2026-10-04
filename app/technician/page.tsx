@@ -80,7 +80,7 @@ function nextAction(status: string) {
   if (status === "created") return "Accept job";
   if (status === "assigned") return "Start / mark on site";
   if (status === "in_progress") return "Submit for review";
-  if (status === "awaiting_leadman_review") return "Leadman review";
+  if (status === "awaiting_leadman_review") return "Supervisor review";
   if (status === "awaiting_client_signoff") return "Client sign-off";
   if (status === "parts_required") return "Parts required";
   if (status === "quotation_required") return "Quotation required";
@@ -364,7 +364,7 @@ export default function TechnicianApp() {
                   <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#327482]">Technician Layout</p>
                   <h2 className="mt-3 text-2xl font-bold tracking-[-0.05em] text-[#123747] sm:text-4xl">Today&apos;s field work</h2>
                   <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">
-                    Start jobs, record findings, upload evidence, and submit completed work for leadman review.
+                    Start jobs, record findings, upload evidence, and submit completed work for supervisor review.
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-3">
@@ -466,7 +466,7 @@ export default function TechnicianApp() {
                   </div>
                   <div>
                     <p className="text-sm font-bold text-[#123747]">{reviewJobs.length} of {jobs.length} jobs past field step</p>
-                    <p className="mt-2 text-sm leading-6 text-slate-500">Submit completed work for leadman review after diagnosis, work notes, and evidence photos.</p>
+                    <p className="mt-2 text-sm leading-6 text-slate-500">Submit completed work for supervisor review after diagnosis, work notes, and evidence photos.</p>
                   </div>
                 </div>
               </article>

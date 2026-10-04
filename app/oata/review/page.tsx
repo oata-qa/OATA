@@ -63,7 +63,7 @@ function evidenceSummary(job: ReviewJob, photos: PhotoCount[]) {
   ];
 }
 
-export default function LeadmanReviewPage() {
+export default function SupervisorReviewPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [jobs, setJobs] = useState<ReviewJob[]>([]);
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -99,7 +99,7 @@ export default function LeadmanReviewPage() {
     setProfile(activeProfile);
 
     if (!REVIEW_ROLES.has(activeProfile.role)) {
-      setMessage("Only leadman and OATA operations roles can review work orders.");
+      setMessage("Only supervisor/reviewer and OATA operations roles can review work orders.");
       setLoading(false);
       return;
     }
@@ -186,13 +186,13 @@ export default function LeadmanReviewPage() {
   }
 
   if (loading) {
-    return <OataLoading label="Loading leadman review queue..." />;
+    return <OataLoading label="Loading supervisor review queue..." />;
   }
 
   return (
     <OataPageShell
       eyebrow="OATA Quality Control"
-      title="Leadman Review"
+      title="Supervisor Review"
       description="Review technician evidence, diagnosis, and work performed before releasing the job for client sign-off."
       userLabel={profile ? `${profile.full_name} · ${profile.role.replace(/_/g, " ")}` : null}
       actions={[{ label: "Technician", href: "/technician", variant: "ghost" }, { label: "Dispatch", href: "/oata/dispatch", variant: "ghost" }, { label: "Dashboard", href: "/", variant: "primary" }]}
@@ -220,7 +220,7 @@ export default function LeadmanReviewPage() {
         <section className="space-y-4">
           {jobs.length === 0 ? (
             <article className="rounded-3xl border border-dashed border-slate-300 bg-white p-10 text-center text-slate-500 shadow-sm">
-              No work orders are waiting for leadman review.
+              No work orders are waiting for supervisor review.
             </article>
           ) : jobs.map((job) => {
             const branch = job.branch_id ? branchMap.get(job.branch_id) : null;
@@ -277,7 +277,7 @@ export default function LeadmanReviewPage() {
                       value={comments[job.id] ?? ""}
                       onChange={(event) => setComments((prev) => ({ ...prev, [job.id]: event.target.value }))}
                       rows={3}
-                      placeholder="Leadman review comment / send-back reason"
+                      placeholder="Supervisor review comment / send-back reason"
                       className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-cyan-600"
                     />
 

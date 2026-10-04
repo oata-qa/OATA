@@ -274,7 +274,7 @@ export default function ReportPage() {
             <div className="rounded-xl border border-slate-200 p-4">
               <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">OATA Quality Review</h3>
               <p className="mt-2 text-sm">
-                Leadman / Reviewer: <span className="font-semibold">{report.leadman_name ?? "—"}</span>
+                Supervisor / Reviewer: <span className="font-semibold">{report.leadman_name ?? "—"}</span>
               </p>
               <p className="mt-1 text-sm">
                 Technician: <span className="font-semibold">{report.technician_name ?? "—"}</span>

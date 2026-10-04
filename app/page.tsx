@@ -68,7 +68,7 @@ const cleaningTypes = ["hood_cleaning", "duct_cleaning", "grease_trap", "drainag
 
 const primaryActions = [
   { label: "Dispatch Queue", detail: "Approved requests to work orders", href: "/oata/dispatch" },
-  { label: "Leadman Review", detail: "Evidence and quality control", href: "/oata/review" },
+  { label: "Supervisor Review", detail: "Technical / quality control", href: "/oata/review" },
   { label: "Client Sign-off", detail: "Completion approval and report readiness", href: "/client/signoff" },
   { label: "Reports", detail: "Service reports and certificates", href: "/reports" },
   { label: "Client Portal", detail: "Contracts, restaurants, approvals", href: "/client" },
@@ -105,7 +105,7 @@ function mapJobToWorkQueue(job: ServiceJobRow): WorkQueueItem {
       : job.status === "in_progress"
       ? "Complete findings, photos, and measurements"
       : job.status === "awaiting_leadman_review"
-      ? "Leadman to verify quality"
+      ? "Supervisor to verify quality"
       : job.status === "awaiting_client_signoff"
       ? "Client sign-off required"
       : job.status === "awaiting_manager_approval"

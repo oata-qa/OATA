@@ -134,7 +134,7 @@ export async function POST(request: NextRequest) {
       serviceRequest.hermes_priority_reason ? `Priority reason: ${serviceRequest.hermes_priority_reason}` : null,
       dispatchNotes ? `Dispatch notes: ${dispatchNotes}` : null,
     ].filter(Boolean).join("\n"),
-    recommendations: "OATA dispatch to assign technician/leadman and verify work scope before execution.",
+    recommendations: "OATA dispatch to assign technician/supervisor and verify work scope before execution.",
     assigned_to: cleanId(payload.assigned_to),
     leadman_id: cleanId(payload.leadman_id),
     scheduled_at: normalize(payload.scheduled_at) || null,

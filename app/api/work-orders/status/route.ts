@@ -169,7 +169,7 @@ export async function POST(request: NextRequest) {
 
   if (action === "leadman_approve") {
     if (!REVIEW_ROLES.has(profile.role)) {
-      return NextResponse.json({ error: "Only leadman or OATA operations roles can approve review." }, { status: 403 });
+      return NextResponse.json({ error: "Only supervisor/reviewer or OATA operations roles can approve review." }, { status: 403 });
     }
     if (job.status !== "awaiting_leadman_review") {
       return NextResponse.json({ error: `Work order can only be approved from awaiting_leadman_review. Current status: ${job.status}` }, { status: 409 });
@@ -177,24 +177,24 @@ export async function POST(request: NextRequest) {
     updatePayload = {
       status: "awaiting_client_signoff",
       leadman_id: job.leadman_id ?? profile.id,
-      work_performed: appendText(job.work_performed, notes ? `Leadman approved for client sign-off: ${notes}` : `Leadman approved for client sign-off by ${profile.full_name}.`),
+      work_performed: appendText(job.work_performed, notes ? `Supervisor approved for client sign-off: ${notes}` : `Supervisor approved for client sign-off by ${profile.full_name}.`),
     };
   }
 
   if (action === "send_back") {
     if (!REVIEW_ROLES.has(profile.role)) {
-      return NextResponse.json({ error: "Only leadman or OATA operations roles can send work back." }, { status: 403 });
+      return NextResponse.json({ error: "Only supervisor/reviewer or OATA operations roles can send work back." }, { status: 403 });
     }
     if (job.status !== "awaiting_leadman_review") {
       return NextResponse.json({ error: `Work order can only be sent back from awaiting_leadman_review. Current status: ${job.status}` }, { status: 409 });
     }
     if (!notes) {
-      return NextResponse.json({ error: "Leadman send-back reason is required." }, { status: 400 });
+      return NextResponse.json({ error: "Supervisor send-back reason is required." }, { status: 400 });
     }
     updatePayload = {
       status: "in_progress",
       leadman_id: job.leadman_id ?? profile.id,
-      work_performed: appendText(job.work_performed, `Leadman sent back for correction: ${notes}`),
+      work_performed: appendText(job.work_performed, `Supervisor sent back for correction: ${notes}`),
     };
   }
 

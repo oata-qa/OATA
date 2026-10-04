@@ -39,7 +39,7 @@ function evidenceGates(job: JobWithNames, photos: JobPhoto[]) {
     { label: "Finding / diagnosis", done: Boolean(job.diagnosis) },
     { label: "Work notes", done: Boolean(job.work_performed) },
     { label: "After photo", done: photos.some((photo) => photo.photo_type === "after") },
-    { label: "Leadman review", done: ["awaiting_client_signoff", "completed"].includes(job.status) },
+    { label: "Supervisor review", done: ["awaiting_client_signoff", "completed"].includes(job.status) },
     { label: "Client sign-off", done: job.status === "completed" || Boolean(job.client_signoff_name) },
   ];
 }

@@ -189,7 +189,7 @@ export function downloadReportPdf(report: PdfReport) {
         width: "*",
         stack: [
           { text: "OATA QUALITY REVIEW", style: "sectionLabel" },
-          { text: `Leadman / Reviewer: ${report.leadman_name ?? "—"}`, style: "cellValue" },
+          { text: `Supervisor / Reviewer: ${report.leadman_name ?? "—"}`, style: "cellValue" },
           { text: `Technician: ${report.technician_name ?? "—"}`, style: "body" },
         ],
         border: [true, true, true, true],

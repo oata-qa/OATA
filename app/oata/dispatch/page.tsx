@@ -266,7 +266,7 @@ export default function OataDispatchPage() {
                         {technicians.filter((person) => person.role !== "leadman").map((person) => <option key={person.id} value={person.id}>{person.full_name} · {fmt(person.role)}</option>)}
                       </select>
                     </label>
-                    <label className="block text-sm font-semibold text-slate-700">Leadman / supervisor
+                    <label className="block text-sm font-semibold text-slate-700">Supervisor / reviewer
                       <select value={leadmanId[request.id] ?? ""} onChange={(event) => setLeadmanId((prev) => ({ ...prev, [request.id]: event.target.value }))} className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-normal outline-none focus:border-[#327482]">
                         <option value="">Assign later</option>
                         {technicians.filter((person) => person.role === "leadman" || person.role.includes("supervisor") || person.role.includes("head_of")) .map((person) => <option key={person.id} value={person.id}>{person.full_name} · {fmt(person.role)}</option>)}
