@@ -136,7 +136,11 @@ export function badgeClass(value: string) {
 }
 
 export function statusLabel(status: string) {
-  return status.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  const labels: Record<string, string> = {
+    awaiting_leadman_review: "Awaiting Supervisor Review",
+  };
+
+  return labels[status] ?? status.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 export function categoryLabel(category: string) {
